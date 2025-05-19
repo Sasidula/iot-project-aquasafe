@@ -1,6 +1,6 @@
 // src/SensorData.jsx
 import React, { useEffect, useState } from "react";
-import { db, ref, onValue } from "../firebase";
+import { db, ref, onValue } from "../utils/firebase.jsx";
 
 const SensorData = () => {
     const [sensorData, setSensorData] = useState({});
