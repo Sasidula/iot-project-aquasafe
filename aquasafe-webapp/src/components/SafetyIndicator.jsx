@@ -3,33 +3,33 @@ import { motion } from "framer-motion"
 export const SafetyIndicator = ({ status }) => {
     const getStatusColor = level => {
         switch (level) {
-            case "danger":
+            case "Danger":
                 return "from-red-500 to-red-600"
-            case "moderate":
+            case "Moderate":
                 return "from-yellow-400 to-yellow-500"
-            case "safe":
+            case "Safe":
             default:
                 return "from-green-500 to-green-600"
         }
     }
     const getStatusBorder = level => {
         switch (level) {
-            case "danger":
+            case "Danger":
                 return "border-red-400"
-            case "moderate":
+            case "Moderate":
                 return "border-yellow-300"
-            case "safe":
+            case "Safe":
             default:
                 return "border-green-400"
         }
     }
     const getStatusText = level => {
         switch (level) {
-            case "danger":
+            case "Danger":
                 return "Danger"
-            case "moderate":
+            case "Moderate":
                 return "Caution"
-            case "safe":
+            case "Safe":
             default:
                 return "Safe"
         }

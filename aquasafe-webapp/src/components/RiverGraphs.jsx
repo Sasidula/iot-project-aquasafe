@@ -10,9 +10,19 @@ import {
     ResponsiveContainer,
     Legend
 } from "recharts"
-import { historicalData } from "../utils/mockData"
+//import { historicalData } from "../utils/mockData"
+import {useRealData} from "../utils/useRealData.jsx";
+
 export const RiverGraphs = () => {
     const [activeTab, setActiveTab] = useState("flowRate")
+    const {
+        sensorData,
+        safetyStatus,
+        weatherForecast,
+        historicalData,
+        alerts,
+        safetyTips
+    } = useRealData();
     const tabs = [
         {
             id: "flowRate",

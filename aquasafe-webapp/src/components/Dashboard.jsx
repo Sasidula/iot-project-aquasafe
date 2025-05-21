@@ -5,9 +5,18 @@ import { SafetyIndicator } from "./SafetyIndicator"
 import { WeatherForecast } from "./WeatherForecast"
 import { RiverGraphs } from "./RiverGraphs"
 import { AlertsPanel } from "./AlertsPanel"
-import { safetyStatus, sensorData } from "../utils/mockData"
+//import { SafetyResources } from "./SafetyResources"
+import {useRealData} from "../utils/useRealData.jsx";
 export const Dashboard = () => {
     const [menuOpen, setMenuOpen] = useState(false)
+    const {
+        sensorData,
+        safetyStatus,
+        weatherForecast,
+        historicalData,
+        alerts,
+        safetyTips
+    } = useRealData();
     return (
         <div className="flex flex-col min-h-screen w-full bg-gradient-to-b from-blue-900 to-blue-800 text-white">
             <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />

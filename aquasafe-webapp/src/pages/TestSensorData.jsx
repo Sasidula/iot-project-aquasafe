@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { db, ref, onValue } from "../utils/firebase.jsx";
 
-const SensorData = () => {
+const TestSensorData = () => {
     const [sensorData, setSensorData] = useState({});
 
     useEffect(() => {
@@ -34,4 +34,4 @@ const SensorData = () => {
     );
 };
 
-export default SensorData;
+export default TestSensorData;

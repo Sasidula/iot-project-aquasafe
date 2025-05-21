@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { LoadingScreen } from "./components/LoadingScreen"
 import { Dashboard } from "./components/Dashboard"
-import SensorData from "./components/SensorData.jsx";
+import TestSensorData from "./pages/TestSensorData.jsx";
 
 function Home() {
     const [isLoading, setIsLoading] = useState(true)
@@ -26,7 +26,7 @@ export function App() {
             <div className="flex flex-col min-h-screen w-full bg-white">
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/test" element={SensorData} />
+                    <Route path="/test" element={<TestSensorData/>} />
                 </Routes>
             </div>
         </BrowserRouter>
