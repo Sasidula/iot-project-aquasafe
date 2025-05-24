@@ -5,6 +5,14 @@ export function useRealData() {
     const [sensorViewData, setSensorViewData] = useState({});
     const [weatherData, setWeatherData] = useState({});
     const [safetyData, setSafetyData] = useState({});
+    const [alerts, setAlerts] = useState([]);
+    const [weatherForecast, setWeatherForecast] = useState([]);
+    const [historicalData, setHistoricalData] = useState({
+        flowRate: [],
+        waterLevel: [],
+        waterTemperature: [],
+        turbidity: []
+    });
 
     const weatherAPIKey = '05d0f3de4b3b4e9c853142033251705';
     const location = '6.951457,79.918599';
@@ -15,12 +23,37 @@ export function useRealData() {
         const unsubscribe = onValue(sensorRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+
                 setSensorViewData(data);
+
+                const now = new Date();
+                const label = formatTimeLabel(now);
+
+                const waterLevel = 100 - data.distance_cm; // example conversion
+                const flowRate = data.flow_rate_lpm;
+                const waterTemp = data.water_temperature_c;
+                const turbidity = data.turbidity_voltage;
+
+                setHistoricalData(prev => ({
+                    flowRate: [...prev.flowRate.slice(-23), { time: label, value: flowRate }],
+                    waterLevel: [...prev.waterLevel.slice(-23), { time: label, value: waterLevel }],
+                    waterTemperature: [...prev.waterTemperature.slice(-23), { time: label, value: waterTemp }],
+                    turbidity: [...prev.turbidity.slice(-23), { time: label, value: turbidity }]
+                }));
+
             }
         });
 
         return () => unsubscribe();
     }, []);
+
+    const formatTimeLabel = (date) => {
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const suffix = hours >= 12 ? "PM" : "AM";
+        const hour = hours % 12 || 12;
+        return `${hour}:${minutes.toString().padStart(2, "0")} ${suffix}`;
+    };
 
     useEffect(() => {
         fetch(`https://api.weatherapi.com/v1/forecast.json?key=${weatherAPIKey}&q=${location}&days=${days}&alerts=yes`)
@@ -28,9 +61,62 @@ export function useRealData() {
             .then(data => {
                 setWeatherData(data);
                 console.log('Weather Forecast:', data);
+
+                // Extract alerts if available
+                const weatherAlerts = data?.alerts?.alert || [];
+
+                // Map them into your custom format
+                const formattedAlerts = weatherAlerts.map((alert, index) => ({
+                    id: index + 1,
+                    type: mapAlertSeverityToType(alert.severity),
+                    title: alert.headline || "Weather Alert",
+                    message: alert.desc || "No description available.",
+                    timestamp: alert.effective || new Date().toISOString()
+                }));
+
+                setAlerts(formattedAlerts);
+
+                // === Extract Forecast ===
+                const formattedForecast = data?.forecast?.forecastday?.map((dayData, index) => ({
+                    day: index === 0 ? "Today" : new Date(dayData.date).toLocaleDateString(undefined, { weekday: 'long' }),
+                    condition: mapConditionToIcon(dayData.day.condition.text),
+                    highTemp: Math.round(dayData.day.maxtemp_c),
+                    lowTemp: Math.round(dayData.day.mintemp_c),
+                    precipitation: Math.round(dayData.day.daily_chance_of_rain),
+                    windSpeed: Math.round(dayData.day.maxwind_kph * 0.621371), // Convert to mph
+                    uvIndex: dayData.day.uv
+                }));
+
+                setWeatherForecast(formattedForecast);
+
             })
             .catch(error => console.error('Weather API error:', error));
     }, []);
+
+    function mapAlertSeverityToType(severity) {
+        switch ((severity || "").toLowerCase()) {
+            case "minor":
+                return "info";
+            case "moderate":
+                return "warning";
+            case "severe":
+            case "extreme":
+                return "danger";
+            default:
+                return "info";
+        }
+    }
+
+    function mapConditionToIcon(conditionText) {
+        const text = conditionText.toLowerCase();
+        if (text.includes("sunny")) return "sunny";
+        if (text.includes("cloud")) return "cloudy";
+        if (text.includes("rain")) return "rainy";
+        if (text.includes("storm")) return "stormy";
+        if (text.includes("snow")) return "snowy";
+        return "partly-cloudy";
+    }
+
 
     useEffect(() => {
         if (
@@ -190,125 +276,6 @@ export function useRealData() {
     };
 
 
-    const weatherForecast = [
-        {
-            day: "Today",
-            condition: "partly-cloudy",
-            highTemp: 72,
-            lowTemp: 58,
-            precipitation: 20,
-            windSpeed: 8,
-            uvIndex: 6
-        },
-        {
-            day: "Tomorrow",
-            condition: "rainy",
-            highTemp: 68,
-            lowTemp: 56,
-            precipitation: 70,
-            windSpeed: 12,
-            uvIndex: 3
-        },
-        {
-            day: "Wednesday",
-            condition: "rainy",
-            highTemp: 64,
-            lowTemp: 55,
-            precipitation: 80,
-            windSpeed: 15,
-            uvIndex: 2
-        },
-        {
-            day: "Thursday",
-            condition: "cloudy",
-            highTemp: 66,
-            lowTemp: 54,
-            precipitation: 30,
-            windSpeed: 10,
-            uvIndex: 4
-        },
-        {
-            day: "Friday",
-            condition: "sunny",
-            highTemp: 70,
-            lowTemp: 56,
-            precipitation: 10,
-            windSpeed: 5,
-            uvIndex: 7
-        }
-    ]
-
-
-    // Historical data for graphs
-    const historicalData = {
-        flowRate: [
-            { time: "12 AM", value: 220 },
-            { time: "3 AM", value: 215 },
-            { time: "6 AM", value: 225 },
-            { time: "9 AM", value: 235 },
-            { time: "12 PM", value: 240 },
-            { time: "3 PM", value: 238 },
-            { time: "6 PM", value: 230 }
-        ],
-        waterLevel: [
-            { time: "12 AM", value: 4.0 },
-            { time: "3 AM", value: 4.1 },
-            { time: "6 AM", value: 4.2 },
-            { time: "9 AM", value: 4.3 },
-            { time: "12 PM", value: 4.3 },
-            { time: "3 PM", value: 4.2 },
-            { time: "6 PM", value: 4.2 }
-        ],
-        waterTemperature: [
-            { time: "12 AM", value: 60 },
-            { time: "3 AM", value: 59 },
-            { time: "6 AM", value: 58 },
-            { time: "9 AM", value: 60 },
-            { time: "12 PM", value: 62 },
-            { time: "3 PM", value: 63 },
-            { time: "6 PM", value: 62 }
-        ],
-        turbidity: [
-            { time: "12 AM", value: 15 },
-            { time: "3 AM", value: 16 },
-            { time: "6 AM", value: 17 },
-            { time: "9 AM", value: 18 },
-            { time: "12 PM", value: 19 },
-            { time: "3 PM", value: 18 },
-            { time: "6 PM", value: 18 }
-        ]
-    }
-
-
-    // Alerts and notifications
-    const alerts = [
-        {
-            id: 1,
-            type: "warning",
-            title: "Increased Flow Rates Expected",
-            message:
-                "Heavy rainfall upstream may cause increased flow rates in the next 24-48 hours. Exercise caution.",
-            timestamp: "2023-06-12T08:30:00Z"
-        },
-        {
-            id: 2,
-            type: "info",
-            title: "Water Quality Testing",
-            message:
-                "Routine water quality testing scheduled for tomorrow morning. Results will be updated by noon.",
-            timestamp: "2023-06-12T10:15:00Z"
-        },
-        {
-            id: 3,
-            type: "danger",
-            title: "Flash Flood Watch",
-            message:
-                "Flash flood watch in effect for the river basin until Wednesday evening. Stay alert to changing conditions.",
-            timestamp: "2023-06-12T07:45:00Z"
-        }
-    ]
-
-
     // Safety tips
     const safetyTips = [
         {
@@ -353,6 +320,126 @@ export function useRealData() {
     };
 }
 
+
+
+/*
+const weatherForecast = [
+    {
+        day: "Today",
+        condition: "partly-cloudy",
+        highTemp: 72,
+        lowTemp: 58,
+        precipitation: 20,
+        windSpeed: 8,
+        uvIndex: 6
+    },
+    {
+        day: "Tomorrow",
+        condition: "rainy",
+        highTemp: 68,
+        lowTemp: 56,
+        precipitation: 70,
+        windSpeed: 12,
+        uvIndex: 3
+    },
+    {
+        day: "Wednesday",
+        condition: "rainy",
+        highTemp: 64,
+        lowTemp: 55,
+        precipitation: 80,
+        windSpeed: 15,
+        uvIndex: 2
+    },
+    {
+        day: "Thursday",
+        condition: "cloudy",
+        highTemp: 66,
+        lowTemp: 54,
+        precipitation: 30,
+        windSpeed: 10,
+        uvIndex: 4
+    },
+    {
+        day: "Friday",
+        condition: "sunny",
+        highTemp: 70,
+        lowTemp: 56,
+        precipitation: 10,
+        windSpeed: 5,
+        uvIndex: 7
+    }
+]
+
+
+// Historical data for graphs
+const historicalData = {
+    flowRate: [
+        { time: "12 AM", value: 220 },
+        { time: "3 AM", value: 215 },
+        { time: "6 AM", value: 225 },
+        { time: "9 AM", value: 235 },
+        { time: "12 PM", value: 240 },
+        { time: "3 PM", value: 238 },
+        { time: "6 PM", value: 230 }
+    ],
+    waterLevel: [
+        { time: "12 AM", value: 4.0 },
+        { time: "3 AM", value: 4.1 },
+        { time: "6 AM", value: 4.2 },
+        { time: "9 AM", value: 4.3 },
+        { time: "12 PM", value: 4.3 },
+        { time: "3 PM", value: 4.2 },
+        { time: "6 PM", value: 4.2 }
+    ],
+    waterTemperature: [
+        { time: "12 AM", value: 60 },
+        { time: "3 AM", value: 59 },
+        { time: "6 AM", value: 58 },
+        { time: "9 AM", value: 60 },
+        { time: "12 PM", value: 62 },
+        { time: "3 PM", value: 63 },
+        { time: "6 PM", value: 62 }
+    ],
+    turbidity: [
+        { time: "12 AM", value: 15 },
+        { time: "3 AM", value: 16 },
+        { time: "6 AM", value: 17 },
+        { time: "9 AM", value: 18 },
+        { time: "12 PM", value: 19 },
+        { time: "3 PM", value: 18 },
+        { time: "6 PM", value: 18 }
+    ]
+}
+
+
+// Alerts and notifications
+const alerts = [
+    {
+        id: 1,
+        type: "warning",
+        title: "Increased Flow Rates Expected",
+        message:
+            "Heavy rainfall upstream may cause increased flow rates in the next 24-48 hours. Exercise caution.",
+        timestamp: "2023-06-12T08:30:00Z"
+    },
+    {
+        id: 2,
+        type: "info",
+        title: "Water Quality Testing",
+        message:
+            "Routine water quality testing scheduled for tomorrow morning. Results will be updated by noon.",
+        timestamp: "2023-06-12T10:15:00Z"
+    },
+    {
+        id: 3,
+        type: "danger",
+        title: "Flash Flood Watch",
+        message:
+            "Flash flood watch in effect for the river basin until Wednesday evening. Stay alert to changing conditions.",
+        timestamp: "2023-06-12T07:45:00Z"
+    }
+]*/
 
 
 

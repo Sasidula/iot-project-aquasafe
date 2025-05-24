@@ -78,9 +78,18 @@ export const AlertsPanel = () => {
                     animate="show"
                     className="space-y-4"
                 >
-                    {alerts.map(alert => (
-                        <AlertItem key={alert.id} alert={alert} item={item} />
-                    ))}
+                    {alerts.length > 0 ? (
+                        alerts.map(alert => (
+                            <AlertItem key={alert.id} alert={alert} item={item} />
+                        ))
+                    ) : (
+                        <motion.div
+                            variants={item}
+                            className="text-blue-300 text-center p-4 bg-blue-700/30 rounded-lg border border-blue-600/30"
+                        >
+                            There are no alerts at the moment.
+                        </motion.div>
+                    )}
                 </motion.div>
             ) : (
                 <motion.div

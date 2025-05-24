@@ -59,26 +59,6 @@ const MobileMenu = ({ setMenuOpen }) => {
         {
             name: "Dashboard",
             icon: "layout-dashboard"
-        },
-        {
-            name: "Historical Data",
-            icon: "history"
-        },
-        {
-            name: "River Maps",
-            icon: "map"
-        },
-        {
-            name: "Safety Resources",
-            icon: "shield"
-        },
-        {
-            name: "Settings",
-            icon: "settings"
-        },
-        {
-            name: "About",
-            icon: "info"
         }
     ]
     return (
@@ -121,3 +101,27 @@ const MobileMenu = ({ setMenuOpen }) => {
         </div>
     )
 }
+
+
+/*
+    ,
+    {
+        name: "Historical Data",
+        icon: "history"
+    },
+    {
+        name: "River Maps",
+        icon: "map"
+    },
+    {
+        name: "Safety Resources",
+        icon: "shield"
+    },
+    {
+        name: "Settings",
+        icon: "settings"
+    },
+    {
+        name: "About",
+        icon: "info"
+    }*/
