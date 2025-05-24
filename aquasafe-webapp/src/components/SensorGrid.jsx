@@ -24,13 +24,13 @@ export const SensorGrid = ({ data }) => {
             name: "Turbidity",
             value: `${data.turbidity} NTU`,
             status: data.turbidityStatus,
-            icon: "droplets"
+            icon: "flask-conical"
         },
         {
             name: "Rain Status",
-            value: `${data.rain}\n${data.rainValue}(mm)`,
+            value: `${data.rain}`,
             status: data.pHStatus,
-            icon: "flask-conical"
+            icon: "droplets"
         }
     ]
     const container = {

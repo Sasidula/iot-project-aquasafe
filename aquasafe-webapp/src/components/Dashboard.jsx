@@ -45,7 +45,7 @@ export const Dashboard = () => {
             )}
             <footer className="bg-blue-900 py-4 px-6 text-center text-blue-300 text-sm">
                 <p>
-                    © 2023 AquaSafe.ai | Data refreshes every 15 minutes |{" "}
+                    © 2023 AquaSafe.ai | Data refreshes with real world updated every moment |{" "}
                     <a href="#" className="underline">
                         Terms & Disclaimer
                     </a>
@@ -54,13 +54,39 @@ export const Dashboard = () => {
         </div>
     )
 }
+
+const SelectLocation = () => {
+    const locations = [
+        "Kelani River",
+        "Mahaweli River",
+        "Kalu Ganga",
+        "Nilwala River"
+    ];
+
+    return (
+        <div className="mb-6">
+            <label className="block text-white text-sm font-medium mb-2">
+                Select River Location
+            </label>
+            <select
+                className="w-full p-3 rounded-lg bg-blue-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                {locations.map((loc, index) => (
+                    <option key={index} value={loc}>
+                        {loc}
+                    </option>
+                ))}
+            </select>
+        </div>
+    )
+
+}
+
 const MobileMenu = ({ setMenuOpen }) => {
+
     const menuItems = [
-        {
-            name: "Dashboard",
-            icon: "layout-dashboard"
-        }
     ]
+
     return (
         <div className="fixed inset-0 bg-blue-900 z-50 p-6">
             <div className="flex justify-end mb-8">
@@ -83,6 +109,11 @@ const MobileMenu = ({ setMenuOpen }) => {
                     </svg>
                 </button>
             </div>
+
+            <div className="mb-6">
+                <SelectLocation />
+            </div>
+
             <nav>
                 <ul className="space-y-6">
                     {menuItems.map((item, index) => (
@@ -104,7 +135,11 @@ const MobileMenu = ({ setMenuOpen }) => {
 
 
 /*
-    ,
+
+    {
+        name: "Dashboard",
+        icon: "layout-dashboard"
+    },
     {
         name: "Historical Data",
         icon: "history"

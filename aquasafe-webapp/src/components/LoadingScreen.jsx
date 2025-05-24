@@ -72,29 +72,31 @@ const Logo = () => (
             xmlns="http://www.w3.org/2000/svg"
         >
             <path
-                d="M3 16.5L9 12L13 15L21 9"
+                d="M3 8C5 6 7 10 9 8C11 6 13 10 15 8C17 6 19 10 21 8"
                 stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
             />
             <path
-                d="M3 7C8.5 7 10 12 16 12C20 12 22 9 22 9"
+                d="M3 12C5 10 7 14 9 12C11 10 13 14 15 12C17 10 19 14 21 12"
                 stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
             />
             <path
-                d="M3 17C8.5 17 10 14 16 14C20 14 22 17 22 17"
+                d="M3 16C5 14 7 18 9 16C11 14 13 18 15 16C17 14 19 18 21 16"
                 stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
             />
         </svg>
     </motion.div>
 )
+
+
 const WaveAnimation = () => {
     return (
         <div className="relative w-64 h-16 mt-8">
@@ -104,7 +106,7 @@ const WaveAnimation = () => {
                     className="absolute bottom-0 left-0 w-full h-4 opacity-70"
                     style={{
                         background: `rgba(147, 197, 253, ${0.3 / i})`,
-                        borderRadius: "50% 50% 0 0"
+                        borderRadius: "50% 50% 0 0 "
                     }}
                     animate={{
                         height: ["40%", "70%", "40%"],

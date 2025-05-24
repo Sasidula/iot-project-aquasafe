@@ -144,7 +144,7 @@ export const RiverGraphs = () => {
                 </ResponsiveContainer>
             </div>
             <div className="mt-3 text-sm text-blue-300 text-center">
-                Data updates every 15 minutes. Click on a tab to view different
+                All graphs are always updated with real-time data. Click on a tab to view different
                 measurements.
             </div>
         </motion.div>
