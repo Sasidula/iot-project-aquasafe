@@ -4,7 +4,7 @@ import { db, ref, onValue } from "./firebase";
 export function useRealData(MenuLocation) {
 
     const [realLocation, setRealLocation] = useState("6.951457,79.918599");
-    const [menuLocation, setMenuLocation] = useState(MenuLocation);
+    const [menuLocation, setMenuLocation] = useState("6.951457,79.918599");
     const [sensorViewData, setSensorViewData] = useState({});
     const [weatherData, setWeatherData] = useState({});
     const [safetyData, setSafetyData] = useState({});
@@ -22,6 +22,8 @@ export function useRealData(MenuLocation) {
     const location = '6.951457,79.918599';
     const days = 5;
 
+
+    /*
     switch (MenuLocation) {
         case "Kelani River":
             setMenuLocation("6.951457,79.918599");
@@ -40,7 +42,11 @@ export function useRealData(MenuLocation) {
             break;
     }
 
-    // ✅ Get browser location
+    console.log("MenuLocation:", MenuLocation);
+    console.log("menuLocation:", menuLocation);
+     */
+
+
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -56,9 +62,11 @@ export function useRealData(MenuLocation) {
             );
         } else {
             console.warn("Geolocation not supported. Using fallback.");
-            setLocation("6.951457,79.918599");
+            setRealLocation("6.951457,79.918599");
         }
     }, []);
+
+    console.log("realLocation:", realLocation);
 
 
     useEffect(() => {
