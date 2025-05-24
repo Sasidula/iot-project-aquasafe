@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { db, ref, onValue } from "./firebase";
 
-export function useRealData() {
+export function useRealData(MenuLocation) {
+
+    const [realLocation, setRealLocation] = useState("6.951457,79.918599");
+    const [menuLocation, setMenuLocation] = useState(MenuLocation);
     const [sensorViewData, setSensorViewData] = useState({});
     const [weatherData, setWeatherData] = useState({});
     const [safetyData, setSafetyData] = useState({});
@@ -15,8 +18,48 @@ export function useRealData() {
     });
 
     const weatherAPIKey = '05d0f3de4b3b4e9c853142033251705';
+    //we will not use logic change the location for now
     const location = '6.951457,79.918599';
     const days = 5;
+
+    switch (MenuLocation) {
+        case "Kelani River":
+            setMenuLocation("6.951457,79.918599");
+            break;
+        case "Mahaweli River":
+            setMenuLocation("6.951457,79.918599");
+            break;
+        case "Kalu Ganga":
+            setMenuLocation("6.951457,79.918599");
+            break;
+        case "Nilwala River":
+            setMenuLocation("6.951457,79.918599");
+            break;
+        default:
+            setMenuLocation("6.951457,79.918599");
+            break;
+    }
+
+    // ✅ Get browser location
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const loc = `${pos.coords.latitude},${pos.coords.longitude}`;
+                    setRealLocation(loc);
+                },
+                (err) => {
+                    console.warn("Geolocation error:", err.message);
+                    // fallback to default
+                    setRealLocation("6.951457,79.918599");
+                }
+            );
+        } else {
+            console.warn("Geolocation not supported. Using fallback.");
+            setLocation("6.951457,79.918599");
+        }
+    }, []);
+
 
     useEffect(() => {
         const sensorRef = ref(db, "sensors");
@@ -47,6 +90,8 @@ export function useRealData() {
         return () => unsubscribe();
     }, []);
 
+
+    //time formating logic
     const formatTimeLabel = (date) => {
         const hours = date.getHours();
         const minutes = date.getMinutes();
@@ -54,6 +99,7 @@ export function useRealData() {
         const hour = hours % 12 || 12;
         return `${hour}:${minutes.toString().padStart(2, "0")} ${suffix}`;
     };
+
 
     useEffect(() => {
         fetch(`https://api.weatherapi.com/v1/forecast.json?key=${weatherAPIKey}&q=${location}&days=${days}&alerts=yes`)
@@ -93,6 +139,8 @@ export function useRealData() {
             .catch(error => console.error('Weather API error:', error));
     }, []);
 
+
+    //danger measuring logic
     function mapAlertSeverityToType(severity) {
         switch ((severity || "").toLowerCase()) {
             case "minor":
@@ -107,6 +155,7 @@ export function useRealData() {
         }
     }
 
+    //"y"ing logic for weather
     function mapConditionToIcon(conditionText) {
         const text = conditionText.toLowerCase();
         if (text.includes("sunny")) return "sunny";
@@ -118,6 +167,7 @@ export function useRealData() {
     }
 
 
+    //get ai output
     useEffect(() => {
         if (
             sensorViewData?.distance_cm &&
@@ -160,6 +210,8 @@ export function useRealData() {
         }
     }, [sensorViewData, weatherData]);
 
+
+    //maping weather condition to api response
     function mapConditionToCode(conditionText) {
         const conditionMap = {
             "Sunny": 1000,
@@ -215,33 +267,31 @@ export function useRealData() {
         return conditionMap[conditionText] || null;
     }
 
+
+    //status measuring logic
     function getFlowRateStatus(flowRateLpm) {
         if (flowRateLpm < 10) return "low";
         if (flowRateLpm <= 20) return "normal";
         if (flowRateLpm <= 30) return "high";
         return "danger";
     }
-
     function getTemperatureStatus(tempC) {
         if (tempC < 15) return "cold";
         if (tempC <= 25) return "normal";
         return "warm";
     }
-
     function getWaterLevelStatus(distanceCm) {
         if (distanceCm < 50) return "low";
         if (distanceCm <= 150) return "normal";
         if (distanceCm <= 200) return "high";
         return "danger";
     }
-
     function getTurbidityStatus(ntu) {
         if (ntu < 10) return "low";
         if (ntu <= 50) return "normal";
         if (ntu <= 100) return "high";
         return "danger";
     }
-
     function getWeatherStatus(wss) {
         if (wss < 10) return "low";
         if (wss <= 50) return "normal";
@@ -249,6 +299,8 @@ export function useRealData() {
         return "danger";
     }
 
+
+    //rain millimeters per min
     let rainfall_mm;
     rainfall_mm = (sensorViewData.rain_value / 1024) * 50
 
@@ -270,6 +322,7 @@ export function useRealData() {
     };
 
 
+    //ai safty output
     const safetyStatus = {
         level: safetyData?.safety_level || "Unknown",
         message: safetyData?.status_message || "Unknown"
@@ -304,6 +357,7 @@ export function useRealData() {
         }
     ]
 
+    //test sets
     console.log("sensorData:", sensorData);
     console.log("safetyStatus:", safetyStatus);
     console.log("weatherForecast:", weatherForecast);

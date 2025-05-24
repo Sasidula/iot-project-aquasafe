@@ -5,10 +5,13 @@ import { SafetyIndicator } from "./SafetyIndicator"
 import { WeatherForecast } from "./WeatherForecast"
 import { RiverGraphs } from "./RiverGraphs"
 import { AlertsPanel } from "./AlertsPanel"
+import {LocationSelector} from "./LocationSelector.jsx";
 //import { SafetyResources } from "./SafetyResources"
 import {useRealData} from "../utils/useRealData.jsx";
+
 export const Dashboard = () => {
     const [menuOpen, setMenuOpen] = useState(false)
+    const [selectedLocation, setSelectedLocation] = useState("Kelani River")
     const {
         sensorData,
         safetyStatus,
@@ -16,12 +19,22 @@ export const Dashboard = () => {
         historicalData,
         alerts,
         safetyTips
-    } = useRealData();
+    } = useRealData(selectedLocation);
+
     return (
         <div className="flex flex-col min-h-screen w-full bg-gradient-to-b from-blue-900 to-blue-800 text-white">
-            <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+            <Header
+                menuOpen={menuOpen}
+                setMenuOpen={setMenuOpen}
+                selectedLocation={selectedLocation}
+                setSelectedLocation={setSelectedLocation}
+            />
             {menuOpen ? (
-                <MobileMenu setMenuOpen={setMenuOpen} />
+                <MobileMenu
+                    setMenuOpen={setMenuOpen}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
+                />
             ) : (
                 <main className="flex-1 px-4 py-6 md:px-6 lg:px-8 max-w-7xl mx-auto w-full">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -82,7 +95,7 @@ const SelectLocation = () => {
 
 }
 
-const MobileMenu = ({ setMenuOpen }) => {
+const MobileMenu = ({ setMenuOpen, selectedLocation, setSelectedLocation }) => {
 
     const menuItems = [
     ]
@@ -109,26 +122,12 @@ const MobileMenu = ({ setMenuOpen }) => {
                     </svg>
                 </button>
             </div>
-
             <div className="mb-6">
-                <SelectLocation />
+                <LocationSelector
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
+                />
             </div>
-
-            <nav>
-                <ul className="space-y-6">
-                    {menuItems.map((item, index) => (
-                        <li key={index}>
-                            <a
-                                href="#"
-                                className="flex items-center text-xl font-medium text-white hover:text-blue-200"
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                <span>{item.name}</span>
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
         </div>
     )
 }
