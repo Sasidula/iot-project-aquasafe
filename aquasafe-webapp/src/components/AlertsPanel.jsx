@@ -1,18 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 //import { weatherForecast } from "../utils/mockData";
-import {useRealData} from "../utils/useRealData.jsx";
 
-export const AlertsPanel = () => {
+export const AlertsPanel = ({alerts, safetyTips}) => {
     const [activeTab, setActiveTab] = useState("alerts")
-    const {
-        sensorData,
-        safetyStatus,
-        weatherForecast,
-        historicalData,
-        alerts,
-        safetyTips
-    } = useRealData();
     const container = {
         hidden: {
             opacity: 0

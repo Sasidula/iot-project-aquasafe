@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { db, ref, onValue } from "./firebase";
+import { db, ref, onValue, push } from "./firebase.jsx";
 
 export function useRealData(MenuLocation) {
 
@@ -17,36 +17,29 @@ export function useRealData(MenuLocation) {
         turbidity: []
     });
 
-    const weatherAPIKey = '05d0f3de4b3b4e9c853142033251705';
-    //we will not use logic change the location for now
-    const location = '6.951457,79.918599';
-    const days = 5;
+
+    useEffect(() => {
+        switch (MenuLocation) {
+            case "Kelani River":
+                setMenuLocation("6.951457,79.918599");
+                break;
+            case "Mahaweli River":
+                setMenuLocation("7.293,80.633"); // Example coordinate
+                break;
+            case "Kalu Ganga":
+                setMenuLocation("6.558,80.033");
+                break;
+            case "Nilwala River":
+                setMenuLocation("5.944,80.553");
+                break;
+            default:
+                setMenuLocation("6.951457,79.918599");
+                break;
+        }
+    }, [MenuLocation]);
 
 
-    /*
-    switch (MenuLocation) {
-        case "Kelani River":
-            setMenuLocation("6.951457,79.918599");
-            break;
-        case "Mahaweli River":
-            setMenuLocation("6.951457,79.918599");
-            break;
-        case "Kalu Ganga":
-            setMenuLocation("6.951457,79.918599");
-            break;
-        case "Nilwala River":
-            setMenuLocation("6.951457,79.918599");
-            break;
-        default:
-            setMenuLocation("6.951457,79.918599");
-            break;
-    }
-
-    console.log("MenuLocation:", MenuLocation);
-    console.log("menuLocation:", menuLocation);
-     */
-
-
+    //get user real location
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -66,7 +59,16 @@ export function useRealData(MenuLocation) {
         }
     }, []);
 
+    /*
     console.log("realLocation:", realLocation);
+    console.log("menuLocation:", menuLocation);
+*/
+
+    const weatherAPIKey = '05d0f3de4b3b4e9c853142033251705';
+    //const location = menuLocation;
+    //we will not use logic change the location for now
+    const location = '6.951457,79.918599';
+    const days = 5;
 
 
     useEffect(() => {
@@ -187,7 +189,8 @@ export function useRealData(MenuLocation) {
                 temp: sensorViewData.water_temperature_c,
                 air_temp: weatherData.current.temp_c,
                 turbidity: sensorViewData.turbidity_raw,
-                rainfall: sensorViewData.rain_value,
+                //rainfall: sensorViewData.rain_value,
+                rainfall: weatherData.current.precip_mm,
                 wind_speed: weatherData.current.wind_kph,
                 gust_speed: weatherData.current.gust_kph,
                 humidity: weatherData.current.humidity,
@@ -314,20 +317,25 @@ export function useRealData(MenuLocation) {
 
 
     const sensorData = {
-        flowRate: sensorViewData.flow_rate_lpm || 0,
-        flowRateStatus: getFlowRateStatus(sensorViewData.flow_rate_lpm) || "unknown",
-        waterTemperature: sensorViewData.water_temperature_c || 0,
-        temperatureStatus: getTemperatureStatus(sensorViewData.water_temperature_c)|| "unknown",
-        waterLevel: sensorViewData.distance_cm || 0,
-        waterLevelStatus: getWaterLevelStatus(sensorViewData.distance_cm) || "unknown",
-        turbidity: sensorViewData.turbidity_raw,
-        turbidityStatus: getTurbidityStatus(sensorViewData.turbidity_raw)|| "unknown",
-        rain: sensorViewData.rain_level || "unknown",
-        rainValue: rainfall_mm || "unknown",
-        rainStatus: getWeatherStatus(sensorViewData.rain_value)|| "unknown", // acidic, normal, alkaline
+        flowRate: sensorViewData.flow_rate_lpm ?? 0,
+        flowRateStatus: getFlowRateStatus(sensorViewData.flow_rate_lpm) ?? "unknown",
+
+        waterTemperature: sensorViewData.water_temperature_c ?? 0,
+        temperatureStatus: getTemperatureStatus(sensorViewData.water_temperature_c) ?? "unknown",
+
+        waterLevel: sensorViewData.distance_cm ?? 0,
+        waterLevelStatus: getWaterLevelStatus(sensorViewData.distance_cm) ?? "unknown",
+
+        turbidity: sensorViewData.turbidity_raw ?? 0,
+        turbidityStatus: getTurbidityStatus(sensorViewData.turbidity_raw) ?? "unknown",
+
+        rain: sensorViewData.rain_level ?? "unknown",
+        rainValue: rainfall_mm ?? "unknown",
+        rainStatus: getWeatherStatus(rainfall_mm) ?? "unknown",
 
         lastUpdated: new Date().toISOString()
     };
+
 
 
     //ai safty output
@@ -365,12 +373,13 @@ export function useRealData(MenuLocation) {
         }
     ]
 
+    /*
     //test sets
     console.log("sensorData:", sensorData);
     console.log("safetyStatus:", safetyStatus);
     console.log("weatherForecast:", weatherForecast);
     console.log("historicalData:", historicalData);
-    console.log("alerts:", alerts);
+    console.log("alerts:", alerts);*/
 
     return {
         sensorData,

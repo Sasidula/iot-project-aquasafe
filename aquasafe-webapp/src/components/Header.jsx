@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {LocationSelector} from "./LocationSelector.jsx";
-import {useRealData} from "../utils/useRealData.jsx";
 
-export const Header = ({ menuOpen, setMenuOpen }) => {
+export const Header = ({ menuOpen, setMenuOpen, selectedLocation, setSelectedLocation }) => {
     const [locationMenuOpen, setLocationMenuOpen] = useState(false)
-    const [selectedLocation, setSelectedLocation] = useState("Kelani River")
     const currentTime = new Date().toLocaleString("en-US", {
         weekday: "long",
         year: "numeric",
@@ -14,14 +12,6 @@ export const Header = ({ menuOpen, setMenuOpen }) => {
         hour: "2-digit",
         minute: "2-digit"
     })
-    const {
-        sensorData,
-        safetyStatus,
-        weatherForecast,
-        historicalData,
-        alerts,
-        safetyTips
-    } = useRealData(selectedLocation);
 
     return (
         <>

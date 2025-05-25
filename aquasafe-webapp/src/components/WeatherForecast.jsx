@@ -1,17 +1,7 @@
-import React, { Children } from 'react'
+import React from "react"
 import { motion } from 'framer-motion'
-//import { weatherForecast } from '../utils/mockData'
-import {useRealData} from "../utils/useRealData.jsx";
 
-export const WeatherForecast = () => {
-    const {
-        sensorData,
-        safetyStatus,
-        weatherForecast,
-        historicalData,
-        alerts,
-        safetyTips
-    } = useRealData();
+export const WeatherForecast = ({ weatherForecast }) => {
     const container = {
         hidden: {
             opacity: 0,

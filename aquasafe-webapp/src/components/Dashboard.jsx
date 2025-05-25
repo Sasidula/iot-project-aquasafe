@@ -6,8 +6,8 @@ import { WeatherForecast } from "./WeatherForecast"
 import { RiverGraphs } from "./RiverGraphs"
 import { AlertsPanel } from "./AlertsPanel"
 import {LocationSelector} from "./LocationSelector.jsx";
-//import { SafetyResources } from "./SafetyResources"
 import {useRealData} from "../utils/useRealData.jsx";
+import {CommentsPanel} from "./CommentsPanel.jsx";
 
 export const Dashboard = () => {
     const [menuOpen, setMenuOpen] = useState(false)
@@ -46,13 +46,19 @@ export const Dashboard = () => {
                         </div>
                     </div>
                     <div className="mb-6">
-                        <WeatherForecast />
+                        <WeatherForecast weatherForecast={weatherForecast} />
                     </div>
                     <div className="mb-6">
-                        <RiverGraphs />
+                        <RiverGraphs historicalData = {historicalData} />
                     </div>
                     <div className="mb-6">
-                        <AlertsPanel />
+                        <AlertsPanel
+                            alerts={alerts}
+                            safetyTips={safetyTips}
+                        />
+                    </div>
+                    <div className="mb-6">
+                        <CommentsPanel location={selectedLocation}/>
                     </div>
                 </main>
             )}
@@ -68,37 +74,10 @@ export const Dashboard = () => {
     )
 }
 
-const SelectLocation = () => {
-    const locations = [
-        "Kelani River",
-        "Mahaweli River",
-        "Kalu Ganga",
-        "Nilwala River"
-    ];
-
-    return (
-        <div className="mb-6">
-            <label className="block text-white text-sm font-medium mb-2">
-                Select River Location
-            </label>
-            <select
-                className="w-full p-3 rounded-lg bg-blue-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-                {locations.map((loc, index) => (
-                    <option key={index} value={loc}>
-                        {loc}
-                    </option>
-                ))}
-            </select>
-        </div>
-    )
-
-}
 
 const MobileMenu = ({ setMenuOpen, selectedLocation, setSelectedLocation }) => {
 
-    const menuItems = [
-    ]
+
 
     return (
         <div className="fixed inset-0 bg-blue-900 z-50 p-6">
@@ -133,29 +112,29 @@ const MobileMenu = ({ setMenuOpen, selectedLocation, setSelectedLocation }) => {
 }
 
 
-/*
-
-    {
-        name: "Dashboard",
-        icon: "layout-dashboard"
-    },
-    {
-        name: "Historical Data",
-        icon: "history"
-    },
-    {
-        name: "River Maps",
-        icon: "map"
-    },
-    {
-        name: "Safety Resources",
-        icon: "shield"
-    },
-    {
-        name: "Settings",
-        icon: "settings"
-    },
-    {
-        name: "About",
-        icon: "info"
-    }*/
+/*const menuItems = [
+        {
+            name: "Dashboard",
+            icon: "layout-dashboard"
+        },
+        {
+            name: "Historical Data",
+            icon: "history"
+        },
+        {
+            name: "River Maps",
+            icon: "map"
+        },
+        {
+            name: "Safety Resources",
+            icon: "shield"
+        },
+        {
+            name: "Settings",
+            icon: "settings"
+        },
+        {
+            name: "About",
+            icon: "info"
+        }
+    ]*/

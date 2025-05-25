@@ -74,23 +74,23 @@ const Logo = () => (
             <path
                 d="M3 8C5 6 7 10 9 8C11 6 13 10 15 8C17 6 19 10 21 8"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M3 12C5 10 7 14 9 12C11 10 13 14 15 12C17 10 19 14 21 12"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M3 16C5 14 7 18 9 16C11 14 13 18 15 16C17 14 19 18 21 16"
                 stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
         </svg>
     </motion.div>
