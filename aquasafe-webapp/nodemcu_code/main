@@ -1,0 +1,139 @@
+#include <ESP8266WiFi.h>
+#include <Firebase_ESP_Client.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// WiFi Credentials
+const char* ssid = "Redmi Note 11";
+const char* password = "sasidula321";
+
+// Firebase Project API Key and user credentials
+#define API_KEY "AIzaSyBsTOoycYMWw_Zfw0YG6JL5RKcyoHXn_ng"
+#define DATABASE_URL "https://riversafetymonitor-default-rtdb.asia-southeast1.firebasedatabase.app/"
+
+// Firebase objects
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
+
+// DS18B20 Temp Sensor
+#define ONE_WIRE_BUS D0
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+// Ultrasonic Sensor
+const int trigPin = D6;
+const int echoPin = D5;
+
+// Flow Sensor
+const int flowSensorPin = D2;
+volatile int flowPulseCount = 0;
+unsigned long oldTime = 0;
+float flowRate = 0.0;
+float totalLitres = 0.0;
+
+// Turbidity Sensor
+const int turbidityPin = A0;
+
+// Rain Sensor (digital output)
+const int rainDigitalPin = D1;
+
+#define SOUND_SPEED 0.034
+
+void IRAM_ATTR pulseCounter() {
+  flowPulseCount++;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(" Connected!");
+
+  // Firebase config
+  config.api_key = API_KEY;
+  config.database_url = DATABASE_URL;
+  auth.user.email = "sasidulajayara12@gmail.com";
+  auth.user.password = "sasidula321";
+
+  // Begin Firebase
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
+  Serial.println("Firebase initialized");
+
+  // Ultrasonic sensor
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  // Flow sensor
+  pinMode(flowSensorPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(flowSensorPin), pulseCounter, FALLING);
+
+  // Rain sensor
+  pinMode(rainDigitalPin, INPUT);
+
+  // Temp sensor
+  sensors.begin();
+}
+
+void loop() {
+  // Ultrasonic
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  long duration = pulseIn(echoPin, HIGH);
+  float distanceCm = duration * SOUND_SPEED / 2;
+
+  // Turbidity
+  int turbidityValue = analogRead(turbidityPin);
+  float turbidityVoltage = turbidityValue * (3.3 / 1023.0);
+
+  // Rain (digital)
+  int rainDigitalValue = digitalRead(rainDigitalPin);
+  String rainLevel = (rainDigitalValue == HIGH) ? "No Rain" : "Rain Detected";
+
+  // Temp
+  sensors.requestTemperatures();
+  float waterTemperature = sensors.getTempCByIndex(0);
+
+  // Flow
+  unsigned long currentTime = millis();
+  if (currentTime - oldTime > 1000) {
+    detachInterrupt(digitalPinToInterrupt(flowSensorPin));
+    float flowMilliLitres = (flowPulseCount / 7.5);
+    flowRate = flowMilliLitres;
+    totalLitres += flowRate / 60.0;
+
+    // Debug Print
+    Serial.print("Distance: "); Serial.print(distanceCm);
+    Serial.print(" | Flow: "); Serial.print(flowRate);
+    Serial.print(" L/min | Total: "); Serial.print(totalLitres);
+    Serial.print(" L | Turbidity: "); Serial.print(turbidityVoltage, 2);
+    Serial.print("V | Rain: "); Serial.print(rainLevel);
+    Serial.print(" | Temp: "); Serial.println(waterTemperature);
+
+    // Upload to Firebase
+    Firebase.RTDB.setFloat(&fbdo, "/sensors/distance_cm", distanceCm);
+    Firebase.RTDB.setFloat(&fbdo, "/sensors/flow_rate_lpm", flowRate);
+    Firebase.RTDB.setFloat(&fbdo, "/sensors/total_litres", totalLitres);
+    Firebase.RTDB.setFloat(&fbdo, "/sensors/turbidity_voltage", turbidityVoltage);
+    Firebase.RTDB.setInt(&fbdo, "/sensors/turbidity_raw", turbidityValue);
+    Firebase.RTDB.setString(&fbdo, "/sensors/rain_level", rainLevel);
+    Firebase.RTDB.setInt(&fbdo, "/sensors/rain_digital", rainDigitalValue);
+    Firebase.RTDB.setFloat(&fbdo, "/sensors/water_temperature_c", waterTemperature);
+
+    flowPulseCount = 0;
+    oldTime = currentTime;
+    attachInterrupt(digitalPinToInterrupt(flowSensorPin), pulseCounter, FALLING);
+  }
+
+  delay(100);
+}
