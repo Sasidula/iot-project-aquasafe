@@ -184,6 +184,16 @@ The app automatically builds up historical sensor readings in-memory for chartin
 
 ---
 
+
+## 🖼️ ScreenShots
+
+![loading.png](aquasafe-webapp/readme_png/img_3.png)
+![firstView.png](aquasafe-webapp/readme_png/img.png)
+![FullHome.png](aquasafe-webapp/readme_png/img_1.png)
+![FullHome1.png](aquasafe-webapp/readme_png/img_2.png)
+
+---
+
 ## 📄 License
 
 MIT License – Free to use and modify
